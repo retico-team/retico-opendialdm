@@ -11,7 +11,7 @@ Then you need to set the PYOD env variable:
 import os, sys
 os.environ['PYOD'] = '/path/to/pyopendial'
 sys.path.append(prefix+'retico-opendialdm')
-# you might need to add sys.path.append(os.environ['OPENDIAL']) to the dm.py file in retico-opendialdm
+# you might need to add sys.path.append(os.environ['PYOD']) to the dm.py file in retico-opendialdm
 
 from retico_opendialdm.dm import OpenDialModule
 domain_dir = 'dialogue.xml'
