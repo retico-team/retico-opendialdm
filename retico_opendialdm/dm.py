@@ -2,8 +2,8 @@
 from multipledispatch import dispatch
 
 # retico
-
-from retico_core import *
+from retico_core import abstract
+from retico_core import IncrementalUnit
 from retico_core.dialogue import DialogueActIU
 from retico_opendialdm.concept_val import ConceptVal
 
@@ -140,7 +140,10 @@ class OpenDialModule(abstract.AbstractModule, Module):
                 #         print('dm state update {}={}'.format(key, val))
                 # else:
                 #     print('dm state update {}={}'.format(key, val))
+                if isinstance(val, list):
+                    val = ' '.join(val)
                 self._prior_state[key] = val
+                # print(key, type(key), val, type(val))
                 self._system._cur_state.add_to_state(Assignment(key, val))
                 update_occured = True
         if update_occured:
@@ -177,7 +180,7 @@ class OpenDialModule(abstract.AbstractModule, Module):
             output_iu = self.create_iu(self._input_iu)
             output_iu.set_act(action, {})
             # print(f"dm output iu: {output_iu}. ")
-            new_um = UpdateMessage.from_iu(output_iu, abstract.UpdateType.ADD)     
+            new_um = abstract.UpdateMessage.from_iu(output_iu, abstract.UpdateType.ADD)     
             self.append(new_um)
             # concept_val = state.query_prob('concept').get_best()
             # if isinstance(concept_val, ConceptVal):
