@@ -18,7 +18,7 @@ from readers.xml_domain_reader import XMLDomainReader
 from bn.distribs.distribution_builder import CategoricalTableBuilder
 from dialogue_state import DialogueState
 from modules.module import Module
-from collections import Collection
+from collections.abc import Collection
 from bn.values.none_val import NoneVal
 
 class DialogueDecisionIU(abstract.IncrementalUnit):
@@ -114,7 +114,7 @@ class OpenDialModule(abstract.AbstractModule, Module):
     #     super().new_utterance()
 
     def process_update(self, update_message):
-        print("DM got an IU")
+        
         for iu,um in update_message:
             if um == abstract.UpdateType.ADD:
                 self.process_iu(iu)
@@ -124,7 +124,13 @@ class OpenDialModule(abstract.AbstractModule, Module):
     def process_iu(self, input_iu):
         state = input_iu.payload
         update_occured = False
-        assert(type(state)==dict)
+        '''
+        The DM can handle any attr/valu info, so we are assuming any IU that has
+        something for updating the DM uses a dict as its payload
+        '''
+        if  type(state)!=dict: return
+
+        print("DM got an IU", type(input_iu))
         for key in state:
             if self._variables is not None and key in self._variables:
                 val = state[key]
@@ -176,10 +182,11 @@ class OpenDialModule(abstract.AbstractModule, Module):
         # print(f"update vars: {update_vars}")
         if 'decision' in update_vars and state.has_chance_node('decision'):
             action = str(state.query_prob('decision').get_best())
-            # print(f"action: {action}")
+            print(f"action: {action}")
             output_iu = self.create_iu(self._input_iu)
             output_iu.set_act(action, {})
             # print(f"dm output iu: {output_iu}. ")
+            # print(output_iu.payload)
             new_um = abstract.UpdateMessage.from_iu(output_iu, abstract.UpdateType.ADD)     
             self.append(new_um)
             # concept_val = state.query_prob('concept').get_best()
